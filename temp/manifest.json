@@ -1,0 +1,53 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.13/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.13",
+  "id": "c48d2a90-1bc0-11ed-9ad0-c399b79e7ddf",
+  "version": "0.0.1",
+  "packageName": "tabofficessomailsave",
+  "developer": {
+    "name": "Markus Moeller",
+    "websiteUrl": "https://a6a7-95-90-232-4.ngrok.io",
+    "privacyUrl": "https://a6a7-95-90-232-4.ngrok.io/privacy.html",
+    "termsOfUseUrl": "https://a6a7-95-90-232-4.ngrok.io/tou.html"
+  },
+  "name": {
+    "short": "Mail Storage",
+    "full": "Mail Storage"
+  },
+  "description": {
+    "short": "TODO: add short description here",
+    "full": "TODO: add full description here"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#D85028",
+  "configurableTabs": [],
+  "staticTabs": [
+    {
+      "entityId": "6604354b-c356-4299-ab0f-5019cc06bc21",
+      "name": "Mail Storage Tab",
+      "contentUrl": "https://a6a7-95-90-232-4.ngrok.io/mailStorageTab/?name={loginHint}&tenant={tid}&theme={theme}",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "bots": [],
+  "connectors": [],
+  "composeExtensions": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "a6a7-95-90-232-4.ngrok.io"
+  ],
+  "showLoadingIndicator": false,
+  "isFullScreen": false,
+  "webApplicationInfo": {
+    "id": "00ea6b7c-d49c-4cf5-8e7c-82a41ab7063d",
+    "resource": "api://a6a7-95-90-232-4.ngrok.io/00ea6b7c-d49c-4cf5-8e7c-82a41ab7063d"
+  }
+}
