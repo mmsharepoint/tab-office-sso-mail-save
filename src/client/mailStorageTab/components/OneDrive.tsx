@@ -23,18 +23,19 @@ export const OneDrive = (props) => {
     <div>
       <Breadcrumb>
         <Breadcrumb.Item>
-          <BreadcrumbLink onClick={() => getFolders("*", "*", "")} ><OneDriveIcon /></BreadcrumbLink>
+          <BreadcrumbLink className='iconLogo' onClick={() => getFolders("*", "*", "")} ><OneDriveIcon /></BreadcrumbLink>
           {props.currentFolder !== null && props.currentFolder.parentFolder !== null &&
               <BreadcrumbDivider />}
           {props.currentFolder !== null && props.currentFolder.parentFolder !== null &&
-              <BreadcrumbLink onClick={() => getFolders(props.currentFolder.parentFolder.driveID, 
-                                                        props.currentFolder.parentFolder.folderId,
+              <BreadcrumbLink className='breadcrumbFolder' 
+                              onClick={() => getFolders(props.currentFolder.parentFolder.driveID, 
+                                                        props.currentFolder.parentFolder.id,
                                                         props.currentFolder.parentFolder.name)} >{props.currentFolder.parentFolder.name}</BreadcrumbLink>}
           {props.currentFolder !== null && 
               <BreadcrumbDivider />}
           {props.currentFolder !== null && 
               <BreadcrumbLink onClick={() => getFolders(props.currentFolder.driveID, 
-                                                        props.currentFolder.folderId,
+                                                        props.currentFolder.id,
                                                         props.currentFolder.name)} >{props.currentFolder.name}</BreadcrumbLink>}
         </Breadcrumb.Item>
       </Breadcrumb>

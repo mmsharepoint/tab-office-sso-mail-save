@@ -7,9 +7,9 @@ export const Folder = (props) => {
   };
 
   return (
-    <li>
+    <li className='liFolder'>
       <TabsIcon />                
-      <span onClick={getFolder}>{props.folder.name}</span>
+      <span className='folder' onClick={getFolder}>{props.folder.name}</span>
     </li>
   );
 }

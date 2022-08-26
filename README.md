@@ -6,6 +6,19 @@ Teams and Office App to store selected mail in OneDrive
 
 This Microsoft Teams and Office personal tab lists recent mails of signed in user and lets her/him store the whole mail as .eml in a dialog selected personal OneDrive folder.
 
+App live in action inside Teams
+
+![App live in action inside Teams](assets/04AppInActionLIVEInTeams.gif)
+
+App in action inside Outlook
+
+![App in action inside Outlook](assets/03AppInActionInOutlook.png)
+
+App in action inside Teams
+
+![App in action inside Teams](assets/02AppInActionInTeams.png)
+
+
 
 For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2022/08/)
 
@@ -32,6 +45,8 @@ Version|Date|Author|Comments
 This is a Teams and Office personal Tab app using SSO and Microsoft Graph
 * Using SSO with Teams JS SDK 2.0
 * Using O-B-O flow secure and totally in backend to retrieve and store data via Microsoft Graph
+* [Extend Teams apps across Microsoft 365](https://docs.microsoft.com/en-us/microsoftteams/platform/m365-apps/overview?WT.mc_id=M365-MVP-5004617)
+* [Use FluentUI React Northstar List and Dialog](https://fluentsite.z22.web.core.windows.net/)
 
 
 ## Configuration

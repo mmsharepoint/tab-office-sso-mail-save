@@ -51,15 +51,13 @@ export const MailStorageTab = () => {
   const getJoinedTeams =  React.useCallback(async () => {
     const response = await Axios.get(`https://${process.env.PUBLIC_HOSTNAME}/api/joinedTeams`,
     { headers: { Authorization: `Bearer ${token}` }});
-    // if (driveId !== "*" && folderId !== "*") {
-    //   setCurrentFolder({id: folderId, driveID: driveId, parentFolder: currentFolder, name: name})
-    // }
+    setCurrentFolder(null);
     return response.data;
   }, [token]);
 
   const getFolders = async (driveId: string, folderId: string, name: string) => {
     let requestUrl = `https://${process.env.PUBLIC_HOSTNAME}/api/`;
-    if (driveId === folderId) {
+    if (driveId === folderId && driveId !== "*") {
       requestUrl += `TeamRootFolders/${driveId}/${name}`;
     }
     else {
@@ -69,6 +67,9 @@ export const MailStorageTab = () => {
     { headers: { Authorization: `Bearer ${token}` }});
     if (driveId !== "*" && folderId !== "*") {
       setCurrentFolder({id: folderId, driveID: driveId, parentFolder: currentFolder, name: name})
+    }
+    else {
+      setCurrentFolder(null);
     }
     return response.data;
   };
@@ -111,7 +112,7 @@ export const MailStorageTab = () => {
           break;
       }
     }
-  }, [token]);
+  }, [token, currentFolder]);
 
   useEffect(() => {
     if (mails.length > 0) {
@@ -141,7 +142,7 @@ export const MailStorageTab = () => {
             // onOpen={onOpen}
             // open={open}            
             header="Select storage location"
-            trigger={<Button content="Save Mail" />}
+            trigger={<Button content="Save Mail" primary disabled={typeof selectedIndex === 'undefined' || (selectedIndex!<0)} />}
           />
           
         </Flex.Item>
