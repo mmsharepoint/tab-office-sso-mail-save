@@ -1,29 +1,35 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
-import { Breadcrumb, BreadcrumbDivider, BreadcrumbLink, OneDriveIcon } from '@fluentui/react-northstar';
+import { Breadcrumb, BreadcrumbDivider, BreadcrumbLink, TeamsIcon } from '@fluentui/react-northstar';
 import { IFolder } from "../../../model/IFolder";
 import { Folder } from "./Folder";
 
-export const OneDrive = (props) => {
+export const Teams = (props) => {
+  const [teams, setTeams] = useState<IFolder[]>();
   const [folders, setFolders] = useState<IFolder[]>();
 
-  const getFolders = React.useCallback((driveId: string, folderId: string, name: string) => {
+  const getJoinedTeams = React.useCallback(async () => {
+    props.getJoinedTeams().then((result) => {
+      setTeams(result);
+      setFolders([]);
+    });
+  },[props.getJoinedTeams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const getFolders = React.useCallback((driveId: string, folderId: string, name: string) => {    
     props.getFolders(driveId, folderId, name).then((result) => {
       setFolders(result);
     });
   },[props.getFolders]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    props.getFolders("*", "*", "").then((result) => {
-      setFolders(result);
-    });
+    getJoinedTeams();
   }, []);
 
   return (
     <div>
       <Breadcrumb>
         <Breadcrumb.Item>
-          <BreadcrumbLink onClick={() => getFolders("*", "*", "")} ><OneDriveIcon /></BreadcrumbLink>
+          <BreadcrumbLink onClick={() => getJoinedTeams()} ><TeamsIcon /></BreadcrumbLink>
           {props.currentFolder !== null && props.currentFolder.parentFolder !== null &&
               <BreadcrumbDivider />}
           {props.currentFolder !== null && props.currentFolder.parentFolder !== null &&
@@ -40,8 +46,11 @@ export const OneDrive = (props) => {
       </Breadcrumb>
 
       <ul>
-        {folders?.map(f => {
-          return <Folder folder={f} getFolders={getFolders} />
+        {folders?.length === 0 && teams?.map(t => {
+          return <Folder folder={t} getFolders={getFolders} />
+        })}
+        {folders?.length! > 0 && teams?.map(t => {
+          return <Folder folder={t} getFolders={getFolders} />
         })}
       </ul>
     </div>

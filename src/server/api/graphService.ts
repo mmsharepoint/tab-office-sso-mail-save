@@ -116,6 +116,38 @@ export const graphService = (options: any): express.Router => {
     return response.data;
   };
 
+  const getJoinedTeams = async (accessToken: string): Promise<IFolder[]> => {
+    let requestUrl: string = "https://graph.microsoft.com/v1.0/me/joinedTeams?$select=id, displayName";
+
+    const response = await Axios.get(requestUrl, {
+      headers: {          
+          Authorization: `Bearer ${accessToken}`,
+    }});
+    let teams: IFolder[] = [];
+    response.data.value.forEach(item => {
+      teams.push({ 
+        id: item.id, name: item.displayName, driveID: item.id, parentFolder: null
+      });
+    });
+    return teams;
+  };
+
+  const getTeamRootFolders = async (teamID: string, teamName: string, accessToken: string): Promise<IFolder[]> => {
+    let requestUrl: string = `https://graph.microsoft.com/v1.0/groups/${teamID}/drive/root/children?$filter=folder ne null&$select=id, name`;
+
+    const response = await Axios.get(requestUrl, {
+      headers: {          
+          Authorization: `Bearer ${accessToken}`,
+    }});
+    let teams: IFolder[] = [];
+    response.data.value.forEach(item => {
+      teams.push({ 
+        id: item.id, name: item.displayName, driveID: teamID, parentFolder: { id: teamID, driveID: teamID, name: teamName, parentFolder: null}
+      });
+    });
+    return teams;
+  };
+  
   const getFolder = async (driveId: string, folderId: string, accessToken: string): Promise<IFolder[]> => {
     let requestUrl: string = "https://graph.microsoft.com/v1.0/";
     let folder: IFolder|null = null;
@@ -150,6 +182,51 @@ export const graphService = (options: any): express.Router => {
           ["https://graph.microsoft.com/mail.read"]);
         const mails = await getMails(accessToken);
         res.json(mails);
+      }
+      catch (err) {
+        log(err);
+        if (err.status) {
+            res.status(err.status).send(err.message);
+        } else {
+            res.status(500).send(err);
+        }
+      }
+  });
+
+  router.get("/joinedTeams",
+    pass.authenticate("oauth-bearer", { session: false }),
+    async (req: any, res: express.Response, next: express.NextFunction) => {
+      const user: any = req.user;
+      try {
+        const accessToken = await exchangeForToken(user.tid,
+          req.header("Authorization")!.replace("Bearer ", "") as string,
+          ["https://graph.microsoft.com/team.readbasic.all"]);
+        const joinedTeams = await getJoinedTeams(accessToken);
+        res.json(joinedTeams);
+      }
+      catch (err) {
+        log(err);
+        if (err.status) {
+            res.status(err.status).send(err.message);
+        } else {
+            res.status(500).send(err);
+        }
+      }
+  });
+
+  router.get("/TeamRootFolders/:teamId/:teamName",
+    pass.authenticate("oauth-bearer", { session: false }),
+    async (req: any, res: express.Response, next: express.NextFunction) => {
+      const user: any = req.user;
+      try {
+        const accessToken = await exchangeForToken(user.tid,
+          req.header("Authorization")!.replace("Bearer ", "") as string,
+          ["https://graph.microsoft.com/sites.readwrite.all"]);
+        const teamId = req.params.teamId;
+        const teamName = req.params.teamName;
+
+        const rootFolders = await getTeamRootFolders(teamId, teamName, accessToken);
+        res.json(rootFolders);
       }
       catch (err) {
         log(err);

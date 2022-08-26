@@ -4,15 +4,15 @@ import { useState, useEffect } from "react";
 import { useTeams } from "msteams-react-base-component";
 import { app, authentication } from "@microsoft/teams-js";
 import Axios from "axios";
+import { IFolder } from "../../model/IFolder";
 import { IMail } from "../../model/IMail";
 import { OneDrive } from "./components/OneDrive";
-import { IFolder } from "../../model/IFolder";
+import { Teams } from "./components/Teams";
 
 /**
  * Implementation of the Mail Storage Tab content page
  */
 export const MailStorageTab = () => {
-
   const [{ inTeams, theme, context }] = useTeams();
   const [entityId, setEntityId] = useState<string | undefined>();
   const [token, setToken] = useState<string>();
@@ -21,6 +21,7 @@ export const MailStorageTab = () => {
   const [mailItems, setMailItems] = React.useState<ListItemProps[]>([]);
   const [selectedIndex, setSelectedIndex] = React.useState<number>();
   const [currentFolder, setCurrentFolder] = React.useState<IFolder|null>(null);
+  const [dialogContent, setDialogContent] = React.useState<JSX.Element|null>(null);
 
   const attachmentIcon = <PaperclipIcon />;
 
@@ -47,8 +48,24 @@ export const MailStorageTab = () => {
 
   };
 
+  const getJoinedTeams =  React.useCallback(async () => {
+    const response = await Axios.get(`https://${process.env.PUBLIC_HOSTNAME}/api/joinedTeams`,
+    { headers: { Authorization: `Bearer ${token}` }});
+    // if (driveId !== "*" && folderId !== "*") {
+    //   setCurrentFolder({id: folderId, driveID: driveId, parentFolder: currentFolder, name: name})
+    // }
+    return response.data;
+  }, [token]);
+
   const getFolders = async (driveId: string, folderId: string, name: string) => {
-    const response = await Axios.get(`https://${process.env.PUBLIC_HOSTNAME}/api/folders/${driveId}/${folderId}`,
+    let requestUrl = `https://${process.env.PUBLIC_HOSTNAME}/api/`;
+    if (driveId === folderId) {
+      requestUrl += `TeamRootFolders/${driveId}/${name}`;
+    }
+    else {
+      requestUrl += `folders/${driveId}/${folderId}`;
+    }
+    const response = await Axios.get(requestUrl,
     { headers: { Authorization: `Bearer ${token}` }});
     if (driveId !== "*" && folderId !== "*") {
       setCurrentFolder({id: folderId, driveID: driveId, parentFolder: currentFolder, name: name})
@@ -84,6 +101,19 @@ export const MailStorageTab = () => {
   }, [context]);
 
   useEffect(() => {
+    if (context) {
+      switch (context.app.host.name) {
+        case "Teams":
+          setDialogContent(<Teams getJoinedTeams={getJoinedTeams} currentFolder={currentFolder} getFolders={getFolders} />);
+          break;
+        default:
+          setDialogContent(<OneDrive currentFolder={currentFolder} getFolders={getFolders} />);
+          break;
+      }
+    }
+  }, [token]);
+
+  useEffect(() => {
     if (mails.length > 0) {
       let listItems: ListItemProps[] = [];
       mails.forEach((m) => {
@@ -105,13 +135,13 @@ export const MailStorageTab = () => {
         <Dialog
             cancelButton="Cancel"
             confirmButton="Save here"
-            content={<OneDrive currentFolder={currentFolder} getFolders={getFolders} />}
+            content={dialogContent}
             // onCancel={onCancel}
             onConfirm={saveMail}
             // onOpen={onOpen}
-            // open={open}
-            header="Action confirmation"
-            trigger={<Button content="Select folder" />}
+            // open={open}            
+            header="Select storage location"
+            trigger={<Button content="Save Mail" />}
           />
           
         </Flex.Item>
@@ -125,8 +155,6 @@ export const MailStorageTab = () => {
               }}
               items={mailItems}
             />
-            <Button content="Save Mail" primary onClick={saveMail} disabled={typeof selectedIndex !== undefined && (selectedIndex!<0)} />
-              {error && <div><Text content={`An SSO error occurred ${error}`} /></div>}
           </div>
         </Flex.Item>
       </Flex>
