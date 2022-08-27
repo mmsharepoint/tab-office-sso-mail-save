@@ -36,7 +36,7 @@ export const MailStorageTab = () => {
     alert(
       `Mail to save has id "${mails[selectedIndex!].id}" and subject "${mails[selectedIndex!].subject}"`,
     );
-    let requestUrl = `https://${process.env.PUBLIC_HOSTNAME}/api/mail/${mails[selectedIndex!].id}`;
+    let requestUrl = `https://${process.env.PUBLIC_HOSTNAME}/api/mail/${mails[selectedIndex!].id}/${mails[selectedIndex!].subject}`;
     if (currentFolder === null) {
       requestUrl += "/*/*"
     }

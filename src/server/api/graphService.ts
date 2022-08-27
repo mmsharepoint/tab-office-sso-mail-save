@@ -6,6 +6,7 @@ import qs = require("qs");
 import * as debug from "debug";
 import { IFolder } from "../../model/IFolder";
 import { IMail } from "../../model/IMail";
+import { createMailFileName } from "./utilities";
 const log = debug("msteams");
 
 export const graphService = (options: any): express.Router => {
@@ -75,11 +76,11 @@ export const graphService = (options: any): express.Router => {
     return mails;
   };
 
-  const saveMail = async (driveID: string, folderID: string, mailId: string, accessToken: string) => {
+  const saveMail = async (driveID: string, folderID: string, mailId: string, mailSubject: string, accessToken: string) => {
     const mailMIMEContent = await getMailContent(mailId, accessToken);
-    // log(mailMIMEContent);
+    const fileName = createMailFileName(mailSubject);
     if (mailMIMEContent.length < (4 * 1024 * 1024)) {     // If Mail size bigger 4MB use resumable upload
-      const mailDriveItem = await storeMail2OneDrive(driveID, folderID, mailMIMEContent, accessToken);
+      const mailDriveItem = await storeMail2OneDrive(driveID, folderID, mailMIMEContent, fileName, accessToken);
       log(mailDriveItem);
     }
   };
@@ -96,8 +97,7 @@ export const graphService = (options: any): express.Router => {
     return response.data;
   };
 
-  const storeMail2OneDrive = async (driveID: string, folderID: string, mailContent: string, accessToken: string) => {
-    const fileName = "Testmail1";
+  const storeMail2OneDrive = async (driveID: string, folderID: string, mailContent: string, fileName: string, accessToken: string) => {
     let requestUrl: string = `https://graph.microsoft.com/v1.0/`;
     if (driveID === "*" && folderID === "*") {
       requestUrl += `me/drive/root:/${fileName}.eml:/content`;
@@ -133,7 +133,7 @@ export const graphService = (options: any): express.Router => {
   };
 
   const getTeamRootFolders = async (teamID: string, teamName: string, accessToken: string): Promise<IFolder[]> => {
-    let requestUrl: string = `https://graph.microsoft.com/v1.0/groups/${teamID}/drive/root/children?$filter=folder ne null&$select=id, name`;
+    let requestUrl: string = `https://graph.microsoft.com/v1.0/groups/${teamID}/drive/root/children?$filter=folder ne null&$select=id, name, parentReference`;
 
     const response = await Axios.get(requestUrl, {
       headers: {          
@@ -142,7 +142,7 @@ export const graphService = (options: any): express.Router => {
     let teams: IFolder[] = [];
     response.data.value.forEach(item => {
       teams.push({ 
-        id: item.id, name: item.displayName, driveID: teamID, parentFolder: { id: teamID, driveID: teamID, name: teamName, parentFolder: null}
+        id: item.id, name: item.name, driveID: item.parentReference.driveId, parentFolder: { id: teamID, driveID: teamID, name: teamName, parentFolder: null}
       });
     });
     return teams;
@@ -261,18 +261,19 @@ export const graphService = (options: any): express.Router => {
       }
   });
 
-  router.post("/mail/:mailID/:driveId/:folderId",
+  router.post("/mail/:mailID/:mailSubject/:driveId/:folderId",
     pass.authenticate("oauth-bearer", { session: false }),
     async (req: any, res: express.Response, next: express.NextFunction) => {
       const user: any = req.user;
       try {
         const accessToken = await exchangeForToken(user.tid,
           req.header("Authorization")!.replace("Bearer ", "") as string,
-          ["https://graph.microsoft.com/mail.read", "https://graph.microsoft.com/files.readwrite"]);
+          ["https://graph.microsoft.com/mail.read", "https://graph.microsoft.com/files.readwrite", "https://graph.microsoft.com/sites.readwrite.all"]);
         const mailId = req.params.mailID;
+        const mailSubject = req.params.mailSubject;
         const driveId = req.params.driveId;
         const folderId = req.params.folderId;
-        saveMail(driveId, folderId, mailId, accessToken);
+        saveMail(driveId, folderId, mailId, mailSubject, accessToken);
         
         res.json({});
       }

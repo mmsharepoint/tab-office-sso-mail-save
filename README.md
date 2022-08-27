@@ -39,6 +39,50 @@ Version|Date|Author|Comments
 
 **THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
 
+## Minimal Path to Awesome
+- Clone the repository
+    ```bash
+    git clone https://github.com/mmsharepoint/tab-office-sso-mail-save.git
+    ```
+
+- In a console, navigate to `/tab-office-sso-mail-save`
+
+    ```bash
+    cd tab-office-sso-mail-save
+    ```
+
+- Install modules
+
+    ```bash
+    npm install
+
+- Run ngrok in separate bash and note down the given url to .env
+
+    ```bash
+    gulp start-ngrok
+    ```
+
+- You will need to register an app in Azure AD [also described here](https://mmsharepoint.wordpress.com/2021/09/07/meeting-apps-in-microsoft-teams-1-pre-meeting/#appreg)
+  - with client secret
+  - with **delegated** permissions Mail.Read, Team.ReadBasic.All, Files.ReadWrite, Sites.ReadWrite.All, offline_access, openid, profile
+  - With exposed Api "access_as_user" and App ID Uri api://<NGrok-Url>/<App ID>
+  - With the client IDs for Teams App and Teams Web App 1fec8e78-bce4-4aaf-ab1b-5451cc387264 and 5e3ce6c0-2b1f-4285-8d4b-75ee78787346
+  - Also With the client IDs for Office Apps Office web	4765445b-32c6-49b0-83e6-1d93765276ca, Office desktop 0ec893e0-5785-4de6-99da-4ed124e5296c,
+Outlook desktop, mobile	d3590ed6-52b3-4102-aeff-aad2292ab01c, Outlook web bc59ab01-8403-45c6-8796-ac3ef710b3e3
+- Also add the app ID and its secret to .env (taken from .env-sample) as TAB_APP_ID= and 
+    - add the secret to TAB_APP_SECRET"    ```
+
+- Enable Teams Developer Preview in your client via <Your Account> | About | Developer Preview
+
+- Package the app
+    ```bash
+    gulp manifest
+    ```
+- Start the app
+    ```bash
+    gulp serve --debug
+    ```    
+- Sideload the app in Teams
 
 ## Features
 
@@ -47,6 +91,7 @@ This is a Teams and Office personal Tab app using SSO and Microsoft Graph
 * Using O-B-O flow secure and totally in backend to retrieve and store data via Microsoft Graph
 * [Extend Teams apps across Microsoft 365](https://docs.microsoft.com/en-us/microsoftteams/platform/m365-apps/overview?WT.mc_id=M365-MVP-5004617)
 * [Use FluentUI React Northstar List and Dialog](https://fluentsite.z22.web.core.windows.net/)
+* [Upload small (<4MB) DriveItem with Microsoft Graph](https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617) 
 
 
 ## Configuration
