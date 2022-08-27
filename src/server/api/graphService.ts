@@ -81,7 +81,9 @@ export const graphService = (options: any): express.Router => {
     const fileName = createMailFileName(mailSubject);
     if (mailMIMEContent.length < (4 * 1024 * 1024)) {     // If Mail size bigger 4MB use resumable upload
       const mailDriveItem = await storeMail2OneDrive(driveID, folderID, mailMIMEContent, fileName, accessToken);
-      log(mailDriveItem);
+    }
+    else {
+      const mailDriveItem = await saveBigMail(driveID, folderID, mailMIMEContent, fileName, accessToken);
     }
   };
 
@@ -113,6 +115,57 @@ export const graphService = (options: any): express.Router => {
       }
     });
 
+    return response.data;
+  };
+
+  const saveBigMail = async (driveID: string, folderID: string, mimeStream: string, fileName: string, accessToken: string) => {
+    const sessionOptions = {
+      "item": {
+        "@microsoft.graph.conflictBehavior": "rename"
+      }
+    };
+    let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveID}/`;
+    requestUrl += driveID !== folderID ? `items/${folderID}:/${fileName}.eml:/createUploadSession` : `root:/${fileName}.eml:/createUploadSession`;
+    const response = await Axios.post(requestUrl, sessionOptions,
+      {
+      headers: {          
+          Authorization: `Bearer ${accessToken}`,
+      }
+    });
+    const resp = await uploadMailSlices(mimeStream, response.data.uploadUrl);
+    return resp.data;   
+  };
+
+  const uploadMailSlices = async (mimeStream: string, uploadUrl: string) => {
+    let minSize=0;
+    let maxSize=5*327680; // 5*320kb slices --> MUST be a multiple of 320 KiB (327,680 bytes)
+    while(mimeStream.length > minSize) {
+      const fileSlice = mimeStream.slice(minSize, maxSize);
+      const resp = await uploadMailSlice(uploadUrl, minSize, maxSize, mimeStream.length, fileSlice);
+      minSize = maxSize;
+      maxSize += 5*327680;
+      if (maxSize > mimeStream.length) {
+        maxSize = mimeStream.length;
+      }
+      if (resp.id !== undefined) {
+        return resp;
+      } 
+      else {
+        
+      }
+    }
+  };
+
+  const uploadMailSlice = async (uploadUrl: string, minSize: number, maxSize: number, totalSize: number, fileSlice: string) => {
+    // Here no authorization anymore, only in createUploadSession!
+    const header = {
+      "Content-Length": `${maxSize - minSize}`,
+      "Content-Range": `bytes ${minSize}-${maxSize-1}/${totalSize}`
+    };
+    const response = await Axios.put(uploadUrl, fileSlice,
+    {
+      headers: header
+    });
     return response.data;
   };
 

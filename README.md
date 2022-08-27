@@ -91,7 +91,8 @@ This is a Teams and Office personal Tab app using SSO and Microsoft Graph
 * Using O-B-O flow secure and totally in backend to retrieve and store data via Microsoft Graph
 * [Extend Teams apps across Microsoft 365](https://docs.microsoft.com/en-us/microsoftteams/platform/m365-apps/overview?WT.mc_id=M365-MVP-5004617)
 * [Use FluentUI React Northstar List and Dialog](https://fluentsite.z22.web.core.windows.net/)
-* [Upload small (<4MB) DriveItem with Microsoft Graph](https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617) 
+* [Upload small (<4MB) DriveItem with Microsoft Graph](https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617)
+* [Upload large (>4MB) DriveItem with Microsoft Graph in resumable upload](https://docs.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617) 
 
 
 ## Configuration
