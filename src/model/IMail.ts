@@ -4,4 +4,8 @@ export interface IMail {
   subject: string;
   hasAttachments: boolean;
   receivedDateTime: string;
+  alreadyStored: boolean;
+  savedUrl?: string;
+  savedDisplayName?: string;
+  savedDate?: string;
 }

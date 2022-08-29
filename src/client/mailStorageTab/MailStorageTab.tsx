@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Provider, Flex, Text, Button, Header, List, ListItemProps, PaperclipIcon, Dialog } from "@fluentui/react-northstar";
+import { Provider, Flex, Button, List, ListItemProps, PaperclipIcon, Dialog, SaveIcon} from "@fluentui/react-northstar";
 import { useState, useEffect } from "react";
 import { useTeams } from "msteams-react-base-component";
 import { app, authentication } from "@microsoft/teams-js";
@@ -24,6 +24,7 @@ export const MailStorageTab = () => {
   const [dialogContent, setDialogContent] = React.useState<JSX.Element|null>(null);
 
   const attachmentIcon = <PaperclipIcon />;
+  const savedIcon = <SaveIcon />;
 
   const getMails = async (token: string) => {
     const response = await Axios.get(`https://${process.env.PUBLIC_HOSTNAME}/api/mails`,
@@ -105,20 +106,21 @@ export const MailStorageTab = () => {
     if (context) {
       switch (context.app.host.name) {
         case "Teams":
-          setDialogContent(<Teams getJoinedTeams={getJoinedTeams} currentFolder={currentFolder} getFolders={getFolders} />);
+          setDialogContent(<Teams getJoinedTeams={getJoinedTeams} currentFolder={currentFolder} getFolders={getFolders} mail={mails[selectedIndex!]} />);
           break;
+        case "Outlook":
         default:
-          setDialogContent(<OneDrive currentFolder={currentFolder} getFolders={getFolders} />);
+          setDialogContent(<OneDrive currentFolder={currentFolder} getFolders={getFolders} mail={mails[selectedIndex!]} />);
           break;
       }
     }
-  }, [token, currentFolder]);
+  }, [token, currentFolder, selectedIndex]);
 
   useEffect(() => {
     if (mails.length > 0) {
       let listItems: ListItemProps[] = [];
       mails.forEach((m) => {
-        listItems.push({ header: m.from, content: m.subject, media: m.hasAttachments ? (attachmentIcon) : "", headerMedia: m.receivedDateTime });
+        listItems.push({ header: m.from, content: m.subject, media: m.hasAttachments ? (attachmentIcon) : "", headerMedia: m.receivedDateTime, endMedia: m.alreadyStored ? savedIcon : "" });
       });
       setMailItems(listItems);
     }
@@ -133,18 +135,19 @@ export const MailStorageTab = () => {
           padding: ".8rem 0 .8rem .5rem"
       }}>
         <Flex.Item>
-        <Dialog
-            cancelButton="Cancel"
-            confirmButton="Save here"
-            content={dialogContent}
-            // onCancel={onCancel}
-            onConfirm={saveMail}
-            // onOpen={onOpen}
-            // open={open}            
-            header="Select storage location"
-            trigger={<Button content="Save Mail" primary disabled={typeof selectedIndex === 'undefined' || (selectedIndex!<0)} />}
-          />
-          
+          <div className="button">
+          <Dialog
+              cancelButton="Cancel"
+              confirmButton="Save here"
+              content={dialogContent}
+              // onCancel={onCancel}
+              onConfirm={saveMail}
+              // onOpen={onOpen}
+              // open={open}            
+              header="Select storage location"
+              trigger={<Button content="Save Mail" primary disabled={typeof selectedIndex === 'undefined' || (selectedIndex!<0)} />}
+            />
+          </div>
         </Flex.Item>
         <Flex.Item>
           <div>

@@ -10,6 +10,7 @@ import { createMailFileName } from "./utilities";
 const log = debug("msteams");
 
 export const graphService = (options: any): express.Router => {
+  const metadataExtensionName = "mmsharepoint.onmicrosoft.MailStorage";
   const router = express.Router();
   const pass = new passport.Passport();
   router.use(pass.initialize());
@@ -59,7 +60,8 @@ export const graphService = (options: any): express.Router => {
   };
 
   const getMails = async (accessToken: string): Promise<IMail[]> => {     
-    const requestUrl: string = `https://graph.microsoft.com/v1.0/me/messages?$top=10&$skip=0&$select=id,from,subject,receivedDateTime,hasAttachments&$orderby=receivedDateTime desc`;
+    let requestUrl: string = `https://graph.microsoft.com/v1.0/me/messages?$top=10&$skip=0&$select=id,from,subject,receivedDateTime,hasAttachments&$orderby=receivedDateTime desc`;
+    requestUrl += "&$expand=Extensions($filter=id+eq+'Microsoft.OutlookServices.OpenTypeExtension.mmsharepoint.onmicrosoft.MailStorage')"
     const response = await Axios.get(requestUrl, {
         headers: {          
             Authorization: `Bearer ${accessToken}`,
@@ -71,7 +73,11 @@ export const graphService = (options: any): express.Router => {
                   from: element.from.emailAddress.name,
                   subject: element.subject,
                   hasAttachments: element.hasAttachments,
-                  receivedDateTime: element.receivedDateTime });
+                  receivedDateTime: element.receivedDateTime,
+                  alreadyStored: element.extensions !== 'undefined' && element.extensions !== null && element.extensions.length > 0,
+                  savedUrl: element.extensions !== 'undefined' && element.extensions !== null && element.extensions.length > 0 ? element.extensions[0].saveUrl : "",
+                  savedDisplayName: element.extensions !== 'undefined' && element.extensions !== null && element.extensions.length > 0 ? element.extensions[0].saveDisplayName : "",
+                  savedDate: element.extensions !== 'undefined' && element.extensions !== null && element.extensions.length > 0 ? element.extensions[0].savedDate : "" });
     });
     return mails;
   };
@@ -79,11 +85,16 @@ export const graphService = (options: any): express.Router => {
   const saveMail = async (driveID: string, folderID: string, mailId: string, mailSubject: string, accessToken: string) => {
     const mailMIMEContent = await getMailContent(mailId, accessToken);
     const fileName = createMailFileName(mailSubject);
+    let mailDriveItem: any = null;
     if (mailMIMEContent.length < (4 * 1024 * 1024)) {     // If Mail size bigger 4MB use resumable upload
-      const mailDriveItem = await storeMail2OneDrive(driveID, folderID, mailMIMEContent, fileName, accessToken);
+      mailDriveItem = await storeMail2OneDrive(driveID, folderID, mailMIMEContent, fileName, accessToken);
+      log(mailDriveItem);
     }
     else {
-      const mailDriveItem = await saveBigMail(driveID, folderID, mailMIMEContent, fileName, accessToken);
+      mailDriveItem = await saveBigMail(driveID, folderID, mailMIMEContent, fileName, accessToken);
+    }
+    if (mailDriveItem && mailDriveItem.name && mailDriveItem.webUrl && mailDriveItem.createdDateTime) {
+      saveMailMetadata(mailId, mailDriveItem.name, mailDriveItem.webUrl, accessToken);
     }
   };
 
@@ -167,6 +178,25 @@ export const graphService = (options: any): express.Router => {
       headers: header
     });
     return response.data;
+  };
+
+  const saveMailMetadata = async (mailId: string, displayName: string, url: string, accessToken: string) => {
+    const savedDate: Date = new Date();
+    const metadataBody = {
+      "@odata.type" : "microsoft.graph.openTypeExtension",
+      "extensionName" : metadataExtensionName,
+      "saveDisplayName" : displayName,
+      "saveUrl" : url,
+      "savedDate" : savedDate.toISOString()
+    };
+    let requestUrl = `https://graph.microsoft.com/v1.0/me/messages/${mailId}/extensions`;
+    
+    const response = await Axios.post(requestUrl, metadataBody,
+      {
+      headers: {          
+          Authorization: `Bearer ${accessToken}`,
+      }
+    }); 
   };
 
   const getJoinedTeams = async (accessToken: string): Promise<IFolder[]> => {
@@ -321,7 +351,7 @@ export const graphService = (options: any): express.Router => {
       try {
         const accessToken = await exchangeForToken(user.tid,
           req.header("Authorization")!.replace("Bearer ", "") as string,
-          ["https://graph.microsoft.com/mail.read", "https://graph.microsoft.com/files.readwrite", "https://graph.microsoft.com/sites.readwrite.all"]);
+          ["https://graph.microsoft.com/mail.readwrite", "https://graph.microsoft.com/files.readwrite", "https://graph.microsoft.com/sites.readwrite.all"]);
         const mailId = req.params.mailID;
         const mailSubject = req.params.mailSubject;
         const driveId = req.params.driveId;

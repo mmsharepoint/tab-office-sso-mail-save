@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from "react";
-import { Breadcrumb, BreadcrumbDivider, BreadcrumbLink, OneDriveIcon } from '@fluentui/react-northstar';
+import { Breadcrumb, BreadcrumbDivider, BreadcrumbLink, OneDriveIcon, RedbangIcon } from '@fluentui/react-northstar';
 import { IFolder } from "../../../model/IFolder";
 import { Folder } from "./Folder";
 
@@ -21,6 +21,11 @@ export const OneDrive = (props) => {
 
   return (
     <div>
+      {props.mail.alreadyStored &&
+          <div className='saveHint'>
+            <div><RedbangIcon /> You already saved this mail on <span>{new Date (props.mail.savedDate).toLocaleString()}</span></div>
+            <div>to <a href={props.mail.savedUrl}>{props.mail.savedDisplayName}</a></div>
+          </div>}
       <Breadcrumb>
         <Breadcrumb.Item>
           <BreadcrumbLink className='iconLogo' onClick={() => getFolders("*", "*", "")} ><OneDriveIcon /></BreadcrumbLink>

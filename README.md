@@ -18,7 +18,9 @@ App in action inside Teams
 
 ![App in action inside Teams](assets/02AppInActionInTeams.png)
 
+App warning if mail was already stored (powered by Microsoft Graph openExtensions)
 
+![App warning if mail was already stored](assets/07WarningHintSavedAlready.png)
 
 For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2022/08/)
 
@@ -93,7 +95,7 @@ This is a Teams and Office personal Tab app using SSO and Microsoft Graph
 * [Use FluentUI React Northstar List and Dialog](https://fluentsite.z22.web.core.windows.net/)
 * [Upload small (<4MB) DriveItem with Microsoft Graph](https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617)
 * [Upload large (>4MB) DriveItem with Microsoft Graph in resumable upload](https://docs.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617) 
-
+* [Read and store custom data with message object featuring openExtensions](https://docs.microsoft.com/en-us/graph/api/resources/opentypeextension?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617)
 
 ## Configuration
 
