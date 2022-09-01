@@ -15,8 +15,8 @@ export const Teams = (props) => {
     });
   },[props.getJoinedTeams]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getFolders = React.useCallback((driveId: string, folderId: string, name: string) => {    
-    props.getFolders(driveId, folderId, name).then((result) => {
+  const getFolders = React.useCallback((driveId: string, folderId: string, name: string, parentFolder?: IFolder) => {    
+    props.getFolders(driveId, folderId, name, parentFolder).then((result) => {
       setFolders(result);
     });
   },[props.getFolders]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -41,13 +41,12 @@ export const Teams = (props) => {
               <BreadcrumbLink className='breadcrumbFolder' 
                               onClick={() => getFolders(props.currentFolder.parentFolder.driveID, 
                                                         props.currentFolder.parentFolder.id,
-                                                        props.currentFolder.parentFolder.name)} >{props.currentFolder.parentFolder.name}</BreadcrumbLink>}
+                                                        props.currentFolder.parentFolder.name,
+                                                        props.currentFolder.parentFolder.parentFolder)} >{props.currentFolder.parentFolder.name}</BreadcrumbLink>}
           {props.currentFolder !== null && 
               <BreadcrumbDivider />}
           {props.currentFolder !== null && 
-              <BreadcrumbLink onClick={() => getFolders(props.currentFolder.driveID, 
-                                                        props.currentFolder.id,
-                                                        props.currentFolder.name)} >{props.currentFolder.name}</BreadcrumbLink>}
+              <BreadcrumbLink>{props.currentFolder.name}</BreadcrumbLink>}
         </Breadcrumb.Item>
       </Breadcrumb>
 

@@ -56,7 +56,7 @@ export const MailStorageTab = () => {
     return response.data;
   }, [token]);
 
-  const getFolders = async (driveId: string, folderId: string, name: string) => {
+  const getFolders = async (driveId: string, folderId: string, name: string, parentFolder?: IFolder) => {
     let requestUrl = `https://${process.env.PUBLIC_HOSTNAME}/api/`;
     if (driveId === folderId && driveId !== "*") {
       requestUrl += `TeamRootFolders/${driveId}/${name}`;
@@ -67,7 +67,7 @@ export const MailStorageTab = () => {
     const response = await Axios.get(requestUrl,
     { headers: { Authorization: `Bearer ${token}` }});
     if (driveId !== "*" && folderId !== "*") {
-      setCurrentFolder({id: folderId, driveID: driveId, parentFolder: currentFolder, name: name})
+      setCurrentFolder({id: folderId, driveID: driveId, parentFolder: parentFolder !== undefined ? parentFolder : currentFolder, name: name})
     }
     else {
       setCurrentFolder(null);

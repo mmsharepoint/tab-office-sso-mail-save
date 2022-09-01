@@ -22,7 +22,7 @@ App warning if mail was already stored (powered by Microsoft Graph openExtension
 
 ![App warning if mail was already stored](assets/07WarningHintSavedAlready.png)
 
-For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2022/08/)
+For further details see the author's [blog post](https://mmsharepoint.wordpress.com/2022/08/31/extend-teams-apps-to-m365-with-sso-the-right-way/)
 
 ## Prerequisites
 
@@ -66,7 +66,7 @@ Version|Date|Author|Comments
 
 - You will need to register an app in Azure AD [also described here](https://mmsharepoint.wordpress.com/2021/09/07/meeting-apps-in-microsoft-teams-1-pre-meeting/#appreg)
   - with client secret
-  - with **delegated** permissions Mail.Read, Team.ReadBasic.All, Files.ReadWrite, Sites.ReadWrite.All, offline_access, openid, profile
+  - with **delegated** permissions Mail.Read, Mail.ReadWrite, Team.ReadBasic.All, Files.ReadWrite, Sites.ReadWrite.All, offline_access, openid, profile
   - With exposed Api "access_as_user" and App ID Uri api://<NGrok-Url>/<App ID>
   - With the client IDs for Teams App and Teams Web App 1fec8e78-bce4-4aaf-ab1b-5451cc387264 and 5e3ce6c0-2b1f-4285-8d4b-75ee78787346
   - Also With the client IDs for Office Apps Office web	4765445b-32c6-49b0-83e6-1d93765276ca, Office desktop 0ec893e0-5785-4de6-99da-4ed124e5296c,
@@ -95,7 +95,7 @@ This is a Teams and Office personal Tab app using SSO and Microsoft Graph
 * [Use FluentUI React Northstar List and Dialog](https://fluentsite.z22.web.core.windows.net/)
 * [Upload small (<4MB) DriveItem with Microsoft Graph](https://docs.microsoft.com/en-us/graph/api/driveitem-put-content?view=graph-rest-1.0&tabs=http&WT.mc_id=M365-MVP-5004617)
 * [Upload large (>4MB) DriveItem with Microsoft Graph in resumable upload](https://docs.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617) 
-* [Read and store custom data with message object featuring openExtensions](https://docs.microsoft.com/en-us/graph/api/resources/opentypeextension?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617)
+* [Read and store custom data with message object featuring Microsoft Graph openExtensions](https://docs.microsoft.com/en-us/graph/api/resources/opentypeextension?view=graph-rest-1.0&WT.mc_id=M365-MVP-5004617)
 
 ## Configuration
 
