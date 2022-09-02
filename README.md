@@ -35,7 +35,7 @@ For further details see the author's [blog post](https://mmsharepoint.wordpress.
 
 Version|Date|Author|Comments
 -------|----|----|--------
-1.0|Aug XX, 2022|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
+1.0|Aug 31, 2022|[Markus Moeller](https://twitter.com/moeller2_0)|Initial release
 
 ## Disclaimer
 
