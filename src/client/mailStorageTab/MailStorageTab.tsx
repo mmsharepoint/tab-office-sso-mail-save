@@ -138,7 +138,7 @@ export const MailStorageTab = () => {
           <div className="button">
           <Dialog
               cancelButton="Cancel"
-              confirmButton="Save here"
+              confirmButton={(currentFolder !== null || (currentFolder === null && context?.app.host.name !== "Teams")) && "Save here"}
               content={dialogContent}
               // onCancel={onCancel}
               onConfirm={saveMail}
